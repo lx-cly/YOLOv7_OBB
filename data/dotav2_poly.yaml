@@ -1,0 +1,9 @@
+
+train: D:\Projects\XiGuangSuo\yolov5_obb\dataset\Ship_dota_v1.5_1024\train\images    # train images (relative to 'path') 
+val: D:\Projects\XiGuangSuo\yolov5_obb\dataset\Ship_dota_v1.5_1024\val\images   # val images (relative to 'path') 
+#test: val/images  # test images (optional)
+
+# Classes
+# Classes
+nc: 2  # number of classes
+names: ['ship', 'None']  # class names
