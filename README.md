@@ -8,12 +8,15 @@
 * `yolov7_kld_ota.pt`:   [Baidu Drive(6666)](https://pan.baidu.com/s/1iu7QZUPlVSzghFNSXk5P4w )
 * `yolov7_kld.pt`:   [Baidu Drive(6666)](https://pan.baidu.com/s/1iu7QZUPlVSzghFNSXk5P4w )
 * `yolov5_kld.pt`:   [Baidu Drive(6666)](https://pan.baidu.com/s/1iu7QZUPlVSzghFNSXk5P4w )
-The results on **dotav1.5_ship** val set are shown in the table below. 
-|           Model           |     P     |     R     |    Speed<br><sup>3090 b1<br>(ms)     |
+The results on **dotav1.5_ship** val set are shown in the table below. (Speed:3090GPU batch-size=1)
+
+|           Model           |     P     |     R     |  Speed  |
 | :-----------------------: | :-------: | :-------: | :------: |
 |        YOLOv5s_kld        |   85.5%   |   86.9%   |  24.7ms  |
 |     YOLOv7s_kld(ota)      |   92.4%   |   84.4%   |  27.0ms  |
 |     YOLOv7s_kld(nota)     |           |           |          |
+|            ...            |           |           |          |
+    
 ## Installation
 ### Requirements
 * Windows (Recommend), Linux (Recommend)
