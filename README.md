@@ -1,7 +1,19 @@
 # YOLOv7_OBB
 ## The code for the implementation of “[Yolov7](https://arxiv.org/abs/2207.02696) + [Kullback-Leibler Divergence](https://link.zhihu.com/?target=https%3A//ieeexplore.ieee.org/abstract/document/9852282/)”. 
 ## Results and Models
-To be continued
+
+### datasets 
+* `dotav1.5_ship` : [Baidu Drive(6666)](https://pan.baidu.com/s/1eyiZyjOMH9dQ8nCsPfxTTQ ).
+### weights 
+* `yolov7_kld_ota.pt`:   [Baidu Drive(6666)](https://pan.baidu.com/s/1iu7QZUPlVSzghFNSXk5P4w )
+* `yolov7_kld.pt`:   [Baidu Drive(6666)](https://pan.baidu.com/s/1iu7QZUPlVSzghFNSXk5P4w )
+* `yolov5_kld.pt`:   [Baidu Drive(6666)](https://pan.baidu.com/s/1iu7QZUPlVSzghFNSXk5P4w )
+The results on **dotav1.5_ship** val set are shown in the table below. 
+|           Model           |     P     |     R     |    Speed<br><sup>3090 b1<br>(ms)     |
+| :-----------------------: | :-------: | :-------: | :------: |
+|        YOLOv5s_kld        |   85.5%   |   86.9%   |  24.7ms  |
+|     YOLOv7s_kld(ota)      |   92.4%   |   84.4%   |  27.0ms  |
+|     YOLOv7s_kld(nota)     |           |           |          |
 ## Installation
 ### Requirements
 * Windows (Recommend), Linux (Recommend)
