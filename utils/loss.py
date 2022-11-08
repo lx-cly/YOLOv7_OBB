@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 from utils.general import bbox_iou, bbox_alpha_iou, box_iou, box_giou, box_diou, box_ciou, xywh2xyxy
 from utils.torch_utils import is_parallel
-from utils.kld_loss import KLDloss_new, compute_kld_loss,KLDloss
+from utils.kld_loss import compute_kld_loss,KLDloss #KLDloss_new, 
 
 def smooth_BCE(eps=0.1):  # https://github.com/ultralytics/yolov3/issues/238#issuecomment-598028441
     # return positive, negative label smoothing BCE targets
@@ -445,7 +445,7 @@ class ComputeLoss:
         #self.balance = {3: [4.0, 1.0, 0.4]}.get(det.nl, [4.0, 1.0, 0.5, 0.4, .1])  # P3-P7
         self.ssi = list(det.stride).index(16) if autobalance else 0  # stride 16 index
         self.BCEcls, self.BCEobj, self.gr, self.hyp, self.autobalance = BCEcls, BCEobj, model.gr, h, autobalance
-        self.kldbbox = KLDloss(taf=1.0)
+        self.kldbbox = KLDloss(taf=1.0,fun='sqrt')
         for k in 'na', 'nc', 'nl', 'anchors':
             setattr(self, k, getattr(det, k))
 
@@ -584,7 +584,7 @@ class ComputeLossOTA:
         self.balance = {3: [4.0, 1.0, 0.4]}.get(det.nl, [4.0, 1.0, 0.25, 0.06, .02])  # P3-P7
         self.ssi = list(det.stride).index(16) if autobalance else 0  # stride 16 index
         self.BCEcls, self.BCEobj, self.gr, self.hyp, self.autobalance = BCEcls, BCEobj, model.gr, h, autobalance
-        self.kldbbox = KLDloss(taf=1.0)
+        self.kldbbox = KLDloss(taf=1.0,fun='sqrt')
         self.use_ota = bool(self.hyp['use_ota'])  # use control ota 
         for k in 'na', 'nc', 'nl', 'anchors', 'stride':
             setattr(self, k, getattr(det, k))
@@ -747,7 +747,7 @@ class ComputeLossOTA:
             all_anch = torch.cat(all_anch, dim=0)
 
             if self.use_ota:
-                pair_wise_iou_loss = compute_kld_loss(txyxy,pxyxys)#box_iou(txyxy, pxyxys)
+                pair_wise_iou_loss = compute_kld_loss(txyxy,pxyxys,taf=1.0,fun='sqrt')#box_iou(txyxy, pxyxys)
                 pair_wise_iou = 1 - pair_wise_iou_loss #** 2 # 
             else:
                 pair_wise_iou = box_iou(txyxy, pxyxys)
