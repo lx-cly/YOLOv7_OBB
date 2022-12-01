@@ -14,7 +14,7 @@ from utils.datasets import create_dataloader
 from utils.general import coco80_to_coco91_class, check_dataset, check_file, check_img_size, check_requirements, \
     box_iou, non_max_suppression,non_max_suppression_obb, scale_coords, scale_polys, xyxy2xywh, xywh2xyxy, set_logging, increment_path, colorstr
 from utils.metrics import ap_per_class, ConfusionMatrix
-from utils.plots import plot_images_val, output_to_target, plot_study_txt
+from utils.plots import plot_images_val,plot_images,output_to_target, plot_study_txt
 from utils.torch_utils import select_device, time_synchronized, TracedModel
 from utils.rboxs_utils import poly2hbb, rbox2poly
 
@@ -22,8 +22,8 @@ def test(data,
          weights=None,
          batch_size=32,
          imgsz=640,
-         conf_thres=0.25,
-         iou_thres=0.45,  # for NMS
+         conf_thres=0.001,
+         iou_thres=0.6,  # for NMS
          save_json=False,
          single_cls=False,
          augment=False,
@@ -108,6 +108,9 @@ def test(data,
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
         targets = targets.to(device)
         nb, _, height, width = img.shape  # batch size, channels, height, width
+        if plots and batch_i < 4:
+            f = save_dir / f'test_batch{batch_i}_labels.jpg'  # labels
+            Thread(target=plot_images, args=(img, targets, paths, f, names), daemon=True).start()
 
         with torch.no_grad():
             # Run model
@@ -156,28 +159,16 @@ def test(data,
             #scale_coords(img[si].shape[1:], predn[:, :4], shapes[si][0], shapes[si][1])  # native-space pred
 
             # Append to text file
-            if save_txt:
+            if save_txt:# just save hbb pred results!
                 gn = torch.tensor(shapes[si][0])[[1, 0, 1, 0]]  # normalization gain whwh
                 for *xyxy, conf, cls in pred_hbbn.tolist():
                     xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                     line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
-                    with open(save_dir / 'labels' / (path.stem + '.txt'), 'a') as f:
+                    with open(save_dir / 'labels' / (path.stem + '.txt'), 'a') as f: 
                         f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
-            # # W&B logging - Media Panel Plots
-            # if len(wandb_images) < log_imgs and wandb_logger.current_epoch > 0:  # Check for test operation
-            #     if wandb_logger.current_epoch % wandb_logger.bbox_interval == 0:
-            #         box_data = [{"position": {"minX": xyxy[0], "minY": xyxy[1], "maxX": xyxy[2], "maxY": xyxy[3]},
-            #                      "class_id": int(cls),
-            #                      "box_caption": "%s %.3f" % (names[cls], conf),
-            #                      "scores": {"class_score": conf},
-            #                      "domain": "pixel"} for *xyxy, conf, cls in pred.tolist()]
-            #         boxes = {"predictions": {"box_data": box_data, "class_labels": names}}  # inference-space
-            #         wandb_images.append(wandb_logger.wandb.Image(img[si], boxes=boxes, caption=path.name))
-            # wandb_logger.log_training_progress(predn, path, names) if wandb_logger and wandb_logger.wandb_run else None
-
             # Append to pycocotools JSON dictionary
-            if save_json:
+            if save_json: # save hbb pred results and poly pred results.
                 # [{"image_id": 42, "category_id": 18, "bbox": [258.15, 41.29, 348.26, 243.78], "score": 0.236}, ...
                 image_id = int(path.stem) if path.stem.isnumeric() else path.stem
                 box = xyxy2xywh(pred_hbbn[:, :4])  # xywh
@@ -232,9 +223,7 @@ def test(data,
             stats.append((correct.cpu(), pred_poly[:, 8].cpu(), pred_poly[:, 9].cpu(), tcls))  # (correct, conf, pcls, tcls)
 
         # Plot images
-        if plots and batch_i < 3:
-            f = save_dir / f'test_batch{batch_i}_labels.jpg'  # labels
-            Thread(target=plot_images_val, args=(img, targets, paths, f, names), daemon=True).start()
+        if plots and batch_i < 4:
             f = save_dir / f'test_batch{batch_i}_pred.jpg'  # predictions
             Thread(target=plot_images_val, args=(img, output_to_target(out), paths, f, names), daemon=True).start()
 
