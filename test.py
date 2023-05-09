@@ -172,7 +172,7 @@ def test(data,
                 box[:, :2] -= box[:, 2:] / 2  # xy center to top-left corner
                 for p, b in zip(pred_polyn.tolist(), box.tolist()):
                     jdict.append({'image_id': image_id,
-                                  'category_id': coco91class[int(p[5])] if is_coco else int(p[5]),
+                                  'category_id': coco91class[int(p[-1])] if is_coco else int(p[-1]+1),
                                   'bbox': [round(x, 1) for x in b],
                                   'score': round(p[-2], 5),
                                   'poly': [round(x, 1) for x in p[:8]],
